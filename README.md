@@ -1,6 +1,6 @@
 # IUH Calendar to ICS
 
-Ứng dụng này cho phép bạn chuyển đổi lịch học từ hệ thống IUH sang định dạng tệp lịch `.ics` (dùng cho Google Calendar, Outlook, v.v.) hoặc lấy dữ liệu lịch học dưới dạng JSON qua API.
+Ứng dụng này cho phép bạn chuyển đổi lịch học từ hệ thống IUH sang định dạng tệp lịch `.ics` (dùng cho Google Calendar, Outlook, Apple Calendar, v.v.) hoặc lấy dữ liệu lịch học dưới dạng JSON qua API.
 
 ## Tính năng
 
