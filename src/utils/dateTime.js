@@ -46,11 +46,25 @@ export function getPreviousMonday(date) {
 export function getModayLists(numberOfWeek) {
   const today = new Date();
   const startMonday = getPreviousMonday(today);
-  const mondayDates = Array.from({ length: numberOfWeek }, (_, i) => {
-    const currentMonday = new Date(startMonday);
-    currentMonday.setDate(startMonday.getDate() + i * 7);
-    return formatDate(currentMonday);
-  });
+  const mondayDates = [];
+
+  // Chuyển đổi numberOfWeek sang số nguyên và kiểm tra tính hợp lệ
+  const numWeeks = parseInt(numberOfWeek, 10);
+  if (isNaN(numWeeks) || numWeeks <= 0) {
+    console.warn(
+      `[WARN] Invalid numberOfWeek provided: ${numberOfWeek}. Returning empty list.`
+    );
+    return []; // Trả về mảng rỗng hoặc xử lý lỗi tùy theo yêu cầu
+  }
+
+  // Tạo một bản sao của ngày thứ Hai đầu tiên để có thể thay đổi trong vòng lặp
+  let currentMonday = new Date(startMonday);
+
+  for (let i = 0; i < numWeeks; i++) {
+    mondayDates.push(formatDate(currentMonday));
+    // Tăng ngày lên 7 để có ngày thứ Hai của tuần tiếp theo
+    currentMonday.setDate(currentMonday.getDate() + 7);
+  }
   return mondayDates;
 }
 

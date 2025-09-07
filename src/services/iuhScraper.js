@@ -4,6 +4,12 @@ import { load } from 'cheerio';
 import { _TRANS_INTO_STUDY_TIME } from '../utils/transIntoTime.js';
 import { add50Minutes } from '../utils/dateTime.js';
 import { getCache, setCache } from './cache.js';
+import { IUH_BASE_URL } from '../config.js'; // Import IUH_BASE_URL
+
+// Helper function to clean text
+function cleanText(text) {
+  return text?.trim().replace(/\s+/g, ' ') || '';
+}
 
 function processClassesFromHtml(htmlData) {
   const $ = load(htmlData);
@@ -16,13 +22,13 @@ function processClassesFromHtml(htmlData) {
       const fullDateText = $(el).html() || '';
       const parts = fullDateText.split('<br>');
       days.push({
-        thu: parts[0]?.trim().replace(/\s+/g, ' ') || '',
-        ngay: parts[1]?.trim().replace(/\s+/g, ' ') || '',
+        thu: cleanText(parts[0]),
+        ngay: cleanText(parts[1]),
       });
     }
   });
   $('tbody tr td:first-child b').each((i, el) => {
-    periods.push($(el).text().trim());
+    periods.push(cleanText($(el).text()));
   });
   $('tbody tr').each((rowIndex, rowElement) => {
     const period = periods[rowIndex];
@@ -36,12 +42,7 @@ function processClassesFromHtml(htmlData) {
           .find('.content')
           .each((classIndex, classElement) => {
             const classInfo = {};
-            const tietText = $(classElement)
-              .find('p')
-              .eq(1)
-              .text()
-              .trim()
-              .replace(/\s+/g, ' ');
+            const tietText = cleanText($(classElement).find('p').eq(1).text());
             const tietMatch = tietText.match(/Tiết: (\d+) - (\d+)/);
             if (tietMatch) {
               classInfo.tietBatDau = parseInt(tietMatch[1]);
@@ -51,31 +52,11 @@ function processClassesFromHtml(htmlData) {
                 _TRANS_INTO_STUDY_TIME[classInfo.tietKetThuc];
               classInfo.gioKetThuc = add50Minutes(lastPeriodStartTime);
             }
-            classInfo.name = $(classElement)
-              .find('b a')
-              .text()
-              .trim()
-              .replace(/\s+/g, ' ');
-            classInfo.code = $(classElement)
-              .find('p')
-              .eq(0)
-              .text()
-              .trim()
-              .replace(/\s+/g, ' ');
+            classInfo.name = cleanText($(classElement).find('b a').text());
+            classInfo.code = cleanText($(classElement).find('p').eq(0).text());
             classInfo.tietHocRaw = tietText;
-            classInfo.phongHoc = $(classElement)
-              .find('p span')
-              .text()
-              .replace('Phòng:', '')
-              .trim()
-              .replace(/\s+/g, ' ');
-            classInfo.giangVien = $(classElement)
-              .find('p')
-              .last()
-              .text()
-              .replace('GV:', '')
-              .trim()
-              .replace(/\s+/g, ' ');
+            classInfo.phongHoc = cleanText($(classElement).find('p span').text().replace('Phòng:', ''));
+            classInfo.giangVien = cleanText($(classElement).find('p').last().text().replace('GV:', ''));
             classInfo.thu = dayInfo.thu;
             classInfo.ngay = dayInfo.ngay;
             classInfo.caHoc = period;
@@ -102,8 +83,12 @@ export async function fetchAndProcessSchedule(k, mondayDates) {
   console.log(`[INFO] Đã trả về ${cachedResults.length} dữ liệu về lịch học từ cache`);
   let fetchedResults = [];
   if (uncachedDates.length > 0) {
-    const url = 'https://sv.iuh.edu.vn/SinhVienTraCuu/GetDanhSachLichTheoTuan';
-    const insecureAgent = new https.Agent({ rejectUnauthorized: false });
+    // Sử dụng IUH_BASE_URL từ biến môi trường
+    const url = `${IUH_BASE_URL}/SinhVienTraCuu/GetDanhSachLichTheoTuan`;
+    // KHUYẾN NGHỊ: Chỉ sử dụng trong môi trường phát triển.
+    // Trong môi trường production, hãy đảm bảo chứng chỉ SSL hợp lệ
+    // hoặc cấu hình biến môi trường để kiểm soát hành vi này.
+    const insecureAgent = new https.Agent({ rejectUnauthorized: process.env.NODE_ENV !== 'production' });
 
     const fetchPromises = uncachedDates.map((pNgayHienTai) => {
       const payload = new URLSearchParams({ k, pNgayHienTai, pLoaiLich: '0' });

@@ -2,3 +2,4 @@
 LichHoc_IUH.ics
 node_modules/
 yarn.lock
+.env
