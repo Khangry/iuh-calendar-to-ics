@@ -95,6 +95,7 @@ export async function fetchAndProcessSchedule(k, mondayDates) {
     const cached = getCache(k, [date]);
     if (cached) {
       cachedResults.push(...cached);
+      console.log(`[INFO] Đã trả về ${cachedResults.length} dữ liệu về lịch học từ cache`);
     } else {
       uncachedDates.push(date);
     }
