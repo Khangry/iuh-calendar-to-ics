@@ -3,7 +3,7 @@
 import express from 'express';
 const router = express.Router();
 
-import { getPreviousMonday, formatDate } from '../utils/dateTime.js';
+import { getModayLists } from '../utils/dateTime.js';
 import { fetchAndProcessSchedule } from '../services/iuhScraper.js';
 import { convertToIcs } from '../services/icsConverter.js';
 
@@ -14,15 +14,9 @@ router.get('/', async (req, res) => {
             return res.status(400).send('Lỗi: Vui lòng cung cấp tham số "k" trên URL.');
         }
         console.log(`[INFO] Bắt đầu xử lý yêu cầu cho mã k: ${k}`);
-
-        const today = new Date();
-        const startMonday = getPreviousMonday(today);
-        const mondayDates = Array.from({ length: 8 }, (_, i) => {
-            const currentMonday = new Date(startMonday);
-            currentMonday.setDate(startMonday.getDate() + i * 7);
-            return formatDate(currentMonday);
-        });
-
+        const { w } = req.query || 8;
+        console.log(`[INFO] Đang xử lý lịch học cho ${w} tuần.`);
+        let mondayDates = getModayLists(w);
         const allClasses = await fetchAndProcessSchedule(k, mondayDates);
         if (allClasses.length === 0) {
             return res.status(404).send('Không tìm thấy lịch học nào...');
