@@ -12,14 +12,6 @@
 - Node.js >= 14
 - Kết nối Internet
 
-## Cài đặt
-
-```bash
-git clone https://github.com/your-repo/iuh-calendar-to-ics.git
-cd iuh-calendar-to-ics
-npm install
-```
-
 ## Cách lấy mã `k`
 
 1. Truy cập [https://sv.iuh.edu.vn/tra-cuu-thong-tin.html](https://sv.iuh.edu.vn/tra-cuu-thong-tin.html)
@@ -38,7 +30,7 @@ npm install
      `https://sv.iuh.edu.vn/tra-cuu/lich-hoc-theo-tuan.html?k=abcxyz`
    - Hãy sao chép phần mã phía sau `k=` để sử dụng cho ứng dụng này.
 
-## Chạy ứng dụng
+## Dành cho nhà phát triển
 
 ```bash
 yarn add . && yarn start
