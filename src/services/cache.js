@@ -33,7 +33,7 @@ export function setCache(k, mondayDates, data) {
  * @param {number} maxAgeMs - thời gian tối đa dữ liệu còn hợp lệ (ms)
  * @returns {any|null}
  */
-export function getCache(k, mondayDates, maxAgeMs = 12 * 60 * 60 * 1000) {
+export function getCache(k, mondayDates, maxAgeMs = 30 * 60 * 1000) {
   const key = makeCacheKey(k, mondayDates);
   const cached = cache.get(key);
   if (!cached) return null;
