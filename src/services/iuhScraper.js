@@ -3,6 +3,7 @@ import https from 'https';
 import { load } from 'cheerio';
 import { _TRANS_INTO_STUDY_TIME } from '../utils/transIntoTime.js';
 import { add50Minutes } from '../utils/dateTime.js';
+import { getCache, setCache } from './cache.js';
 
 function processClassesFromHtml(htmlData) {
   const $ = load(htmlData);
@@ -86,27 +87,47 @@ function processClassesFromHtml(htmlData) {
 }
 
 export async function fetchAndProcessSchedule(k, mondayDates) {
-  const url = 'https://sv.iuh.edu.vn/SinhVienTraCuu/GetDanhSachLichTheoTuan';
-  const insecureAgent = new https.Agent({ rejectUnauthorized: false });
+  // Tách các ngày đã có trong cache và chưa có
+  const cachedResults = [];
+  const uncachedDates = [];
 
-  const fetchPromises = mondayDates.map((pNgayHienTai) => {
-    const payload = new URLSearchParams({ k, pNgayHienTai, pLoaiLich: '0' });
-    return axios.post(url, payload.toString(), { httpsAgent: insecureAgent });
-  });
-
-  const responses = await Promise.all(fetchPromises);
-  console.log(
-    `[INFO] Đã nhận được ${responses.length} phản hồi từ máy chủ IUH.`
-  );
-
-  const allClasses = [];
-  for (const response of responses) {
-    const classesForWeek = processClassesFromHtml(response.data);
-    allClasses.push(...classesForWeek);
+  for (const date of mondayDates) {
+    const cached = getCache(k, [date]);
+    if (cached) {
+      cachedResults.push(...cached);
+    } else {
+      uncachedDates.push(date);
+    }
   }
-  console.log(
-    `[INFO] Tổng cộng đã phân tích được ${allClasses.length} lớp học.`
-  );
+
+  let fetchedResults = [];
+  if (uncachedDates.length > 0) {
+    const url = 'https://sv.iuh.edu.vn/SinhVienTraCuu/GetDanhSachLichTheoTuan';
+    const insecureAgent = new https.Agent({ rejectUnauthorized: false });
+
+    const fetchPromises = uncachedDates.map((pNgayHienTai) => {
+      const payload = new URLSearchParams({ k, pNgayHienTai, pLoaiLich: '0' });
+      return axios.post(url, payload.toString(), { httpsAgent: insecureAgent });
+    });
+
+    const responses = await Promise.all(fetchPromises);
+    console.log(
+      `[INFO] Đã nhận được ${responses.length} phản hồi từ máy chủ IUH.`
+    );
+
+    for (let i = 0; i < responses.length; i++) {
+      const classesForWeek = processClassesFromHtml(responses[i].data);
+      fetchedResults.push(...classesForWeek);
+      // Lưu từng ngày vào cache riêng biệt
+      setCache(k, [uncachedDates[i]], classesForWeek);
+    }
+    console.log(
+      `[INFO] Tổng cộng đã phân tích được ${fetchedResults.length} lớp học từ IUH.`
+    );
+  }
+
+  // Ghép kết quả từ cache và từ IUH
+  const allClasses = [...cachedResults, ...fetchedResults];
 
   return allClasses;
 }

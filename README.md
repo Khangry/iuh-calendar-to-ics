@@ -41,7 +41,7 @@ npm install
 ## Chạy ứng dụng
 
 ```bash
-npm start
+yarn add . && yarn start
 ```
 
 Mặc định ứng dụng chạy tại `http://localhost:3000`.

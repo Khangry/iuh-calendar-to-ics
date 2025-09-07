@@ -1,5 +1,5 @@
 // File: src/utils/dateTime.js (ESM)
-import { _TRANS_INTO_TIME } from './transIntoTime.js';
+import { _TRANS_INTO_STUDY_TIME } from './transIntoTime.js';
 
 export function add50Minutes(timeStr) {
   if (!timeStr) return null;

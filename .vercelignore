@@ -2,3 +2,5 @@ node_modules/
 yarn.lock
 LichHoc_IUH.ics
 README.md
+.husky/
+.vscode/
