@@ -11,5 +11,8 @@
       "src": "/(.*)",
       "dest": "index.js"
     }
+  ],
+  "ignore": [
+    "README.md"
   ]
 }
