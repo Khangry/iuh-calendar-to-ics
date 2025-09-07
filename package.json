@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",
@@ -15,5 +16,9 @@
     "axios": "^1.11.0",
     "cheerio": "^1.1.2",
     "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.35.0",
+    "husky": "^9.1.7"
   }
 }

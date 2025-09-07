@@ -1,0 +1,66 @@
+function updateButtonText() {
+  const type = document.getElementById('type').value;
+  const btn = document.getElementById('submitBtn');
+  if (type === 'ics') {
+    btn.textContent = 'Copy link lịch học';
+  } else {
+    btn.textContent = 'Lấy lịch học';
+  }
+}
+function showError(msg) {
+  const errorDiv = document.getElementById('error');
+  errorDiv.textContent = msg;
+  errorDiv.style.display = 'block';
+}
+function hideError() {
+  const errorDiv = document.getElementById('error');
+  errorDiv.textContent = '';
+  errorDiv.style.display = 'none';
+}
+function handleSubmit(e) {
+  e.preventDefault();
+  hideError();
+  document.getElementById('copied').style.display = 'none';
+
+  const link = document.getElementById('iuhLink').value.trim();
+  const weeks = document.getElementById('weeks').value.trim();
+  const type = document.getElementById('type').value;
+
+  if (!link) {
+    showError('Vui lòng nhập link lịch học IUH!');
+    document.getElementById('iuhLink').focus();
+    return false;
+  }
+  if (!weeks || isNaN(weeks) || parseInt(weeks) <= 0) {
+    showError('Vui lòng nhập số tuần hợp lệ (là số nguyên dương)');
+    document.getElementById('weeks').focus();
+    return false;
+  }
+  if (!type) {
+    showError('Vui lòng chọn loại dữ liệu!');
+    document.getElementById('type').focus();
+    return false;
+  }
+
+  // Tách mã k từ link
+  const match = link.match(/[?&]k=([A-Za-z0-9_\-]+)/);
+  if (!match) {
+    showError('Không tìm thấy mã k trong link. Vui lòng kiểm tra lại!');
+    document.getElementById('iuhLink').focus();
+    return false;
+  }
+  const k = match[1];
+
+  let url = '';
+  if (type === 'ics') {
+    url = `${window.location.origin}/schedule?k=${encodeURIComponent(k)}&w=${weeks}`;
+    navigator.clipboard.writeText(url).then(() => {
+      document.getElementById('copied').style.display = 'block';
+    });
+  } else {
+    url = `/api?k=${encodeURIComponent(k)}&w=${weeks}`;
+    window.location.href = url;
+  }
+  return false;
+}
+updateButtonText();

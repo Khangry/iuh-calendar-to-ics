@@ -1,0 +1,43 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 40px;
+}
+.container {
+  max-width: 500px;
+  margin: auto;
+}
+label {
+  display: block;
+  margin-top: 16px;
+}
+.required {
+  color: red;
+  font-weight: bold;
+  margin-left: 4px;
+}
+input,
+select,
+button {
+  width: 100%;
+  padding: 8px;
+  margin-top: 8px;
+}
+.note {
+  font-size: 0.95em;
+  color: #555;
+  margin-top: 8px;
+}
+#copied {
+  color: green;
+  margin-top: 12px;
+  display: none;
+}
+#error {
+  color: #b71c1c;
+  background: #ffeaea;
+  border: 1px solid #f5c2c7;
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 12px;
+  display: none;
+}
