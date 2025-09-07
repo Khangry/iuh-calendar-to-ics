@@ -85,10 +85,7 @@ export async function fetchAndProcessSchedule(k, mondayDates) {
   if (uncachedDates.length > 0) {
     // Sử dụng IUH_BASE_URL từ biến môi trường
     const url = `${IUH_BASE_URL}/SinhVienTraCuu/GetDanhSachLichTheoTuan`;
-    // KHUYẾN NGHỊ: Chỉ sử dụng trong môi trường phát triển.
-    // Trong môi trường production, hãy đảm bảo chứng chỉ SSL hợp lệ
-    // hoặc cấu hình biến môi trường để kiểm soát hành vi này.
-    const insecureAgent = new https.Agent({ rejectUnauthorized: process.env.NODE_ENV !== 'production' });
+    const insecureAgent = new https.Agent({ rejectUnauthorized: false });
 
     const fetchPromises = uncachedDates.map((pNgayHienTai) => {
       const payload = new URLSearchParams({ k, pNgayHienTai, pLoaiLich: '0' });
