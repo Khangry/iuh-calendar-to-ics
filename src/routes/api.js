@@ -13,7 +13,7 @@ api.get('/', async (req, res) => {
         .send('Lỗi: Vui lòng cung cấp tham số "k" trên URL.');
     }
     console.log(`[INFO] Bắt đầu trả dữ liệu về API cho mã k: ${k}`);
-    const { w } = req.query || 8;
+    const { w } = req.query || 4;
     console.log(`[INFO] Đang xử lý lịch học cho yêu cầu của API ${w} tuần.`);
     let mondayDates = getModayLists(w);
     const allClasses = await fetchAndProcessSchedule(k, mondayDates);
