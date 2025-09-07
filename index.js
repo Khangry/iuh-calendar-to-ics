@@ -14,13 +14,13 @@ const PORT = process.env.PORT || 3000;
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
-    res.sendFile = path.join(__dirname, 'public', 'index.html');
+  res.sendFile = path.join(__dirname, 'public', 'index.html');
 });
 
 app.use('/schedule', scheduleRoutes);
 app.use('/api', api);
 
 app.listen(PORT, () => {
-    console.log(`🚀 Máy chủ đang chạy tại http://localhost:${PORT}`);
-    console.log(`👉 Để sử dụng, hãy truy cập: http://localhost:${PORT}/schedule?k=YOUR_K_VALUE`);
+  console.log(`🚀 Máy chủ đang chạy tại http://localhost:${PORT}`);
+  console.log(`👉 Để sử dụng, hãy truy cập: http://localhost:${PORT}/schedule?k=YOUR_K_VALUE`);
 });

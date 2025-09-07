@@ -1,24 +1,5 @@
 // File: src/utils/dateTime.js (ESM)
-
-export const _TRANS_INTO_TIME = {
-  1: '06:30',
-  2: '07:20',
-  3: '08:10',
-  4: '09:10',
-  5: '10:00',
-  6: '10:50',
-  7: '12:30',
-  8: '13:20',
-  9: '14:10',
-  10: '15:10',
-  11: '16:00',
-  12: '16:50',
-  13: '18:00',
-  14: '18:50',
-  15: '19:50',
-  16: '20:40',
-  17: '21:30',
-};
+import { _TRANS_INTO_TIME } from './transIntoTime.js';
 
 export function add50Minutes(timeStr) {
   if (!timeStr) return null;

@@ -1,7 +1,8 @@
 import axios from 'axios';
 import https from 'https';
 import { load } from 'cheerio';
-import { _TRANS_INTO_TIME, add50Minutes } from '../utils/dateTime.js';
+import { _TRANS_INTO_STUDY_TIME } from '../utils/transIntoTime.js';
+import { add50Minutes } from '../utils/dateTime.js';
 
 function processClassesFromHtml(htmlData) {
   const $ = load(htmlData);
@@ -44,9 +45,9 @@ function processClassesFromHtml(htmlData) {
             if (tietMatch) {
               classInfo.tietBatDau = parseInt(tietMatch[1]);
               classInfo.tietKetThuc = parseInt(tietMatch[2]);
-              classInfo.gioBatDau = _TRANS_INTO_TIME[classInfo.tietBatDau];
+              classInfo.gioBatDau = _TRANS_INTO_STUDY_TIME[classInfo.tietBatDau];
               const lastPeriodStartTime =
-                _TRANS_INTO_TIME[classInfo.tietKetThuc];
+                _TRANS_INTO_STUDY_TIME[classInfo.tietKetThuc];
               classInfo.gioKetThuc = add50Minutes(lastPeriodStartTime);
             }
             classInfo.name = $(classElement)
