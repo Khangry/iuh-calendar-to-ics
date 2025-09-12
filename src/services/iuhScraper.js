@@ -88,7 +88,7 @@ export async function fetchAndProcessSchedule(k, mondayDates) {
     const insecureAgent = new https.Agent({ rejectUnauthorized: false });
 
     const fetchPromises = uncachedDates.map((pNgayHienTai) => {
-      const payload = new URLSearchParams({ k, pNgayHienTai, pLoaiLich: '0' });
+      const payload = new URLSearchParams({ k, pNgayHienTai, pLoaiLich: '1' });
       return axios.post(url, payload.toString(), { httpsAgent: insecureAgent });
     });
 

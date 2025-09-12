@@ -41,7 +41,7 @@ export function convertToIcs(allClasses) {
     'VERSION:2.0',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
-    'X-WR-CALNAME:Lịch học & thi (IUH)',
+    'X-WR-CALNAME:Lịch học (IUH)',
     'X-WR-TIMEZONE:Asia/Ho_Chi_Minh',
   ];
   allClasses.forEach((classInfo) => {
