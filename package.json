@@ -18,7 +18,8 @@
     "axios": "^1.11.0",
     "cheerio": "^1.1.2",
     "dotenv": "^17.2.2",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "iuh-schedule-express": "."
   },
   "devDependencies": {
     "eslint": "^9.35.0",
