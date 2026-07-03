@@ -3,24 +3,50 @@ const $ = (id) => document.getElementById(id);
 function showError(msg) {
   const el = $('error');
   el.textContent = msg;
-  el.style.display = 'block';
+  el.classList.add('show');
 }
 function hideError() {
-  $('error').style.display = 'none';
+  $('error').classList.remove('show');
 }
 function flashCopied() {
   const el = $('copied');
-  el.style.display = 'block';
-  setTimeout(() => (el.style.display = 'none'), 2000);
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
 }
-function copy(text) {
-  navigator.clipboard.writeText(text).then(flashCopied);
+function copy(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    flashCopied();
+    if (btn) {
+      const old = btn.textContent;
+      btn.textContent = 'Đã copy';
+      setTimeout(() => (btn.textContent = old), 1500);
+    }
+  });
 }
+
+function setLoading(on) {
+  const btn = $('submitBtn');
+  btn.classList.toggle('loading', on);
+  btn.disabled = on;
+  btn.querySelector('.btn-label').textContent = on
+    ? 'Đang đăng nhập...'
+    : 'Tạo link lịch';
+}
+
+// Ẩn/hiện mật khẩu
+$('togglePw').addEventListener('click', () => {
+  const input = $('password');
+  const btn = $('togglePw');
+  const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  btn.textContent = show ? 'Ẩn' : 'Hiện';
+  btn.setAttribute('aria-label', show ? 'Ẩn mật khẩu' : 'Hiện mật khẩu');
+});
 
 async function handleSubmit(e) {
   e.preventDefault();
   hideError();
-  $('result').style.display = 'none';
+  $('result').hidden = true;
 
   const mssv = $('mssv').value.trim();
   const password = $('password').value;
@@ -29,9 +55,7 @@ async function handleSubmit(e) {
     return;
   }
 
-  const btn = $('submitBtn');
-  btn.disabled = true;
-  btn.textContent = 'Đang đăng nhập...';
+  setLoading(true);
   try {
     const res = await fetch('/api/link', {
       method: 'POST',
@@ -39,28 +63,23 @@ async function handleSubmit(e) {
       body: JSON.stringify({ mssv, password }),
     });
     const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || 'Có lỗi xảy ra.');
-    }
+    if (!res.ok) throw new Error(data.error || 'Có lỗi xảy ra.');
 
     $('greeting').textContent = data.name
-      ? `Xin chào ${data.name}! Link lịch của bạn đã sẵn sàng.`
-      : 'Link lịch của bạn đã sẵn sàng.';
+      ? `Xin chào ${data.name}! Link lịch đã sẵn sàng.`
+      : 'Link lịch đã sẵn sàng.';
 
     const webcal = $('webcalLink');
     webcal.href = data.webcalUrl;
-    webcal.textContent = data.webcalUrl;
     $('httpsLink').value = data.httpsUrl;
+    $('copyHttps').onclick = () => copy(data.httpsUrl, $('copyHttps'));
 
-    $('copyWebcal').onclick = () => copy(data.webcalUrl);
-    $('copyHttps').onclick = () => copy(data.httpsUrl);
-
-    $('result').style.display = 'block';
+    $('result').hidden = false;
+    $('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   } catch (err) {
     showError(err.message);
   } finally {
-    btn.disabled = false;
-    btn.textContent = 'Tạo link lịch';
+    setLoading(false);
   }
 }
 

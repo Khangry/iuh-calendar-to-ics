@@ -7,44 +7,78 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="container">
-      <h2>IUH Calendar to ICS</h2>
-      <p class="note">
-        Đăng nhập bằng tài khoản sinh viên IUH (như app OneUni) để nhận link
-        lịch học &amp; thi subscribe được vào Google/Apple Calendar. Không cần
-        CAPTCHA. Mật khẩu được mã hoá, chỉ dùng để đăng nhập lấy lịch.
-      </p>
+    <main class="card">
+      <header class="head">
+        <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="4.5" width="18" height="16" rx="2.5" />
+          <path d="M3 9h18" />
+          <path d="M8 2.5v4M16 2.5v4" />
+          <path class="tick" d="M8.5 14.5l2.2 2.2 4.3-4.6" />
+        </svg>
+        <h1>IUH Calendar to ICS</h1>
+        <p class="sub">
+          Đăng nhập tài khoản sinh viên IUH để nhận link lịch học &amp; thi,
+          subscribe vào Google / Apple Calendar. Không CAPTCHA.
+        </p>
+      </header>
 
-      <form id="linkForm">
-        <label for="mssv">
-          Mã số sinh viên <span class="required">*</span>
-        </label>
-        <input id="mssv" type="text" placeholder="VD: 20001234" required />
+      <form id="linkForm" novalidate>
+        <label for="mssv">Mã số sinh viên</label>
+        <input
+          id="mssv"
+          type="text"
+          inputmode="numeric"
+          autocomplete="username"
+          placeholder="VD: 20001234"
+          required
+        />
 
-        <label for="password">
-          Mật khẩu <span class="required">*</span>
-        </label>
-        <input id="password" type="password" placeholder="Mật khẩu SV" required />
+        <label for="password">Mật khẩu</label>
+        <div class="pw-wrap">
+          <input
+            id="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Mật khẩu sinh viên"
+            required
+          />
+          <button type="button" id="togglePw" class="pw-toggle" aria-label="Hiện mật khẩu">
+            Hiện
+          </button>
+        </div>
 
-        <button type="submit" id="submitBtn">Tạo link lịch</button>
+        <button type="submit" id="submitBtn" class="primary">
+          <span class="btn-label">Tạo link lịch</span>
+          <span class="spinner" aria-hidden="true"></span>
+        </button>
+
+        <p class="privacy">
+          🔒 Mật khẩu được mã hoá, chỉ dùng để đăng nhập lấy lịch — không lưu,
+          không ghi log.
+        </p>
       </form>
 
-      <div id="error"></div>
+      <div id="error" class="error" role="alert"></div>
 
-      <div id="result" style="display: none">
-        <p id="greeting" class="note"></p>
+      <section id="result" class="result" hidden>
+        <p id="greeting" class="greeting"></p>
 
-        <label>Link subscribe (webcal — nhấn để thêm vào Calendar):</label>
-        <a id="webcalLink" href="#"></a>
-        <button type="button" id="copyWebcal">Copy link webcal</button>
+        <div class="field">
+          <label>Thêm nhanh vào ứng dụng lịch</label>
+          <a id="webcalLink" class="primary as-link" href="#">📅 Mở trong Calendar</a>
+        </div>
 
-        <label>Hoặc link https (dán vào "Add by URL"):</label>
-        <input id="httpsLink" type="text" readonly />
-        <button type="button" id="copyHttps">Copy link https</button>
+        <div class="field">
+          <label>Hoặc dán link này vào “Thêm lịch từ URL”</label>
+          <div class="copy-row">
+            <input id="httpsLink" type="text" readonly />
+            <button type="button" id="copyHttps" class="ghost">Copy</button>
+          </div>
+        </div>
 
-        <div id="copied">Đã copy link vào clipboard!</div>
-      </div>
-    </div>
-    <script src="main.js"></script>
+        <div id="copied" class="copied">Đã copy vào clipboard!</div>
+      </section>
+    </main>
   </body>
+  <script src="main.js"></script>
 </html>
