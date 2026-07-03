@@ -148,6 +148,35 @@ curl -s <CA-Issuers-URL> | openssl x509 -inform DER -out src/certs/rapidssl-inte
 
 ---
 
+## 6. CI/CD
+
+GitHub Actions chạy **lint + test** trên mọi push/PR vào `main`, và **chỉ deploy
+production khi test xanh**.
+
+- [`.github/workflows/ci.yml`](.github/workflows/ci.yml) — lint + test (mọi
+  input/output: crypto, mapper tiết→giờ, ICS, validation route).
+- [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) — job `deploy`
+  `needs: test`, deploy bằng Vercel CLI. Auto Git-deploy của Vercel đã tắt trong
+  [`vercel.json`](vercel.json) (`git.deploymentEnabled.main = false`) để workflow
+  là đường deploy **duy nhất** (không double-deploy).
+
+Chạy test local:
+```bash
+yarn test        # node --test, không cần thêm dependency
+```
+
+**Secrets cần set** (GitHub repo → Settings → Secrets and variables → Actions):
+
+| Secret | Lấy ở đâu |
+|---|---|
+| `VERCEL_TOKEN` | Vercel → Account Settings → Tokens |
+| `VERCEL_ORG_ID` | chạy `vercel link` local → đọc `.vercel/project.json` |
+| `VERCEL_PROJECT_ID` | như trên |
+
+> `ENCRYPTION_KEY` / `CLIENT_SECRET` khi chạy runtime vẫn set trong **Vercel**
+> Environment Variables (không phải GitHub Secrets). GitHub chỉ cần secret để
+> deploy; test dùng giá trị giả trong workflow.
+
 ## Liên hệ
 
 Vấn đề hoặc góp ý: mở GitHub Issue.
