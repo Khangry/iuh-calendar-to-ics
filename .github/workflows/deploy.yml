@@ -7,6 +7,7 @@ name: Deploy to Vercel
 on:
   push:
     branches: [main]
+  workflow_dispatch: {} # cho phép bấm "Run workflow" chạy tay từ tab Actions
 
 jobs:
   test:
