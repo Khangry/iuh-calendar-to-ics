@@ -59,7 +59,7 @@ export function convertToIcs(events) {
     'PRODID:-//iuh-calendar-to-ics//OneUni//VI',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
-    'X-WR-CALNAME:Lịch học & thi (IUH)',
+    'X-WR-CALNAME:Lịch học (IUH)',
     'X-WR-TIMEZONE:Asia/Ho_Chi_Minh',
     'BEGIN:VTIMEZONE',
     'TZID:Asia/Ho_Chi_Minh',
