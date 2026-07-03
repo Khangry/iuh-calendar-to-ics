@@ -1,83 +1,153 @@
 # IUH Calendar to ICS
 
-Ứng dụng này cho phép bạn chuyển đổi lịch học từ hệ thống IUH sang định dạng tệp lịch `.ics` (dùng cho Google Calendar, Outlook, Apple Calendar, v.v.) hoặc lấy dữ liệu lịch học dưới dạng JSON qua API.
+Xuất **lịch học & lịch thi** của sinh viên Đại học Công nghiệp TP.HCM (IUH) ra
+một link `.ics` **subscribe được** vào Google Calendar / Apple Calendar / Outlook.
+Thêm một lần, lịch tự cập nhật định kỳ.
 
-## Tính năng
+> **Mới:** không còn cần mã `k` hay giải CAPTCHA. Đăng nhập trực tiếp bằng
+> **MSSV + mật khẩu** (giống app **OneUni**) — không CAPTCHA, chạy nền ổn định.
 
-- Tải lịch học IUH dưới dạng file `.ics` để nhập vào các ứng dụng lịch.
-- Truy xuất dữ liệu lịch học IUH dưới dạng JSON qua API.
+---
 
-## Yêu cầu
+## 1. Cách dùng
 
-- Node.js >= 14
-- Kết nối Internet
+### Bước 1 — Tạo link lịch
 
-## Cách lấy mã `k`
+1. Mở trang web của ứng dụng (bản đã deploy của bạn, hoặc `http://localhost:3000`
+   khi chạy local).
+2. Nhập **Mã số sinh viên** + **Mật khẩu** (cùng tài khoản dùng cho app OneUni /
+   cổng sinh viên).
+3. Bấm **Tạo link lịch**. Nếu đúng, trang hiện lời chào kèm 2 link:
+   - **Link webcal** — bấm thẳng để thêm vào ứng dụng lịch.
+   - **Link https** — dùng cho ứng dụng nào cần dán URL thủ công.
 
-1. Truy cập [https://sv.iuh.edu.vn/tra-cuu-thong-tin.html](https://sv.iuh.edu.vn/tra-cuu-thong-tin.html)
-2. Nhập các thông tin:
-   - **Mã số sinh viên**
-   - **Họ tên**
-   - **Ngày sinh** theo định dạng `dd/mm/yyyy` (Lưu ý nhập cả dấu "/")
-   - **Số điện thoại**
-   - **Mã bảo vệ**
-3. Sau khi đăng nhập, chọn mục **Lịch theo tuần**.
-4. Bạn sẽ nhận được đường link như sau:
-   ```
-   https://sv.iuh.edu.vn/tra-cuu/lich-hoc-theo-tuan.html?k=MA_K_CUA_BAN
-   ```
-   - **MA_K_CUA_BAN** là chuỗi phía sau `k=`, ví dụ:  
-     `https://sv.iuh.edu.vn/tra-cuu/lich-hoc-theo-tuan.html?k=abcxyz`
-   - Hãy sao chép phần mã phía sau `k=` để sử dụng cho ứng dụng này.
+> Mật khẩu được **mã hoá** trước khi nhét vào link và **không lưu, không ghi log**.
+> Server chỉ dùng nó để đăng nhập lấy lịch mỗi lần lịch đồng bộ. Giữ link riêng tư
+> như giữ mật khẩu — ai có link vẫn xem được lịch của bạn.
 
-## Dành cho nhà phát triển
+### Bước 2 — Thêm vào ứng dụng lịch
+
+**Google Calendar** (nên làm trên máy tính):
+1. Vào [calendar.google.com](https://calendar.google.com) → bên trái, cạnh
+   **Lịch khác** bấm dấu **+** → **Từ URL**.
+2. Dán **link https** → **Thêm lịch**.
+3. Google tự đồng bộ định kỳ (thường vài giờ một lần — độ trễ do Google quyết định).
+
+**Apple Calendar (iPhone/iPad):**
+1. **Cài đặt** → **Lịch** → **Tài khoản** → **Thêm tài khoản** → **Khác** →
+   **Thêm lịch đăng ký**.
+2. Dán **link https** (hoặc bấm **link webcal** từ trình duyệt) → **Tiếp** → **Lưu**.
+
+**Apple Calendar (macOS):** app Lịch → **Tệp** → **Đăng ký lịch mới** → dán link.
+
+**Outlook:** **Thêm lịch** → **Đăng ký từ web** → dán **link https**.
+
+### Cập nhật & giới hạn
+
+- Lịch tự làm mới; **chu kỳ đồng bộ do ứng dụng lịch quyết định**, không phải app này.
+- Mặc định lấy **90 ngày trước → 180 ngày sau**. Muốn đổi, thêm tham số vào link:
+  `...&from=2026-01-01&to=2026-12-31` (định dạng `YYYY-MM-DD`).
+- **Đổi mật khẩu SV** → link cũ hết hiệu lực, vào web tạo link mới.
+
+---
+
+## 2. Tự deploy lên Vercel
+
+1. **Fork** repo này về GitHub của bạn.
+2. Vào [vercel.com](https://vercel.com) → **Add New Project** → chọn repo vừa fork.
+3. Mục **Environment Variables**, thêm:
+
+   | Biến | Bắt buộc | Giá trị |
+   |---|---|---|
+   | `CLIENT_SECRET` | ✅ | client_secret app OneUni (xem `.env.example`). |
+   | `ENCRYPTION_KEY` | ✅ | Chuỗi bí mật **dài, ngẫu nhiên** để mã hoá credential. |
+
+   Tuỳ chọn: `URL_UNI`, `USER_TYPE`, `SCHOOL_CODE`, `DEFAULT_DAYS_BACK`,
+   `DEFAULT_DAYS_FORWARD` (xem bảng dưới).
+4. Bấm **Deploy**. Xong, mở domain Vercel cấp → dùng theo Mục 1.
+
+> ⚠️ Đổi `ENCRYPTION_KEY` sau này = **mọi link đã phát đều hỏng**, sinh viên phải
+> tạo lại. Đặt một lần rồi giữ nguyên.
+
+---
+
+## 3. Chạy local
 
 ```bash
-yarn add . && yarn start
+yarn install
+cp .env.example .env      # rồi điền CLIENT_SECRET + ENCRYPTION_KEY
+yarn start                # http://localhost:3000
 ```
 
-Mặc định ứng dụng chạy tại `http://localhost:3000`.
+---
 
-## Sử dụng
+## 4. Biến môi trường
 
-### 1. Tải lịch học dưới dạng file `.ics`
+| Biến | Mặc định | Mô tả |
+|---|---|---|
+| `CLIENT_SECRET` | — (bắt buộc) | client_secret app OneUni (OAuth2). |
+| `ENCRYPTION_KEY` | — (bắt buộc) | Khoá mã hoá credential nhúng link. |
+| `URL_UNI` | `https://sv.iuh.edu.vn/AppSVGV/` | Base API dữ liệu của trường. |
+| `USER_TYPE` | `2` | Loại tài khoản (2 = sinh viên). |
+| `SCHOOL_CODE` | `IUH` | Mã trường. |
+| `DEFAULT_DAYS_BACK` | `90` | Số ngày lấy về trước. |
+| `DEFAULT_DAYS_FORWARD` | `180` | Số ngày lấy về sau. |
 
-Truy cập đường dẫn sau trên trình duyệt:
+**Dùng cho trường khác trên OneUni:** đổi `URL_UNI` + `SCHOOL_CODE` (username
+OneUni có dạng `<MSSV><USER_TYPE><SCHOOL_CODE>`).
 
-```
-http://localhost:3000/schedule?k=MA_K_CUA_BAN
-```
+---
 
-- Thay `MA_K_CUA_BAN` bằng mã bạn vừa lấy ở bước trên.
-- Tuỳ chọn: Thêm `w` để lấy số tuần (mặc định là 8 tuần).
-  - Ví dụ: `http://localhost:3000/schedule?k=MA_K_CUA_BAN&w=10`
+## 5. Endpoint (cho nhà phát triển)
 
-Kết quả: Trình duyệt sẽ tải về file `LichHoc_IUH.ics`.
+| Method | Path | Mô tả |
+|---|---|---|
+| `POST` | `/api/link` | Body JSON `{ mssv, password }` → `{ name, httpsUrl, webcalUrl }`. Login thử để xác thực. |
+| `GET`  | `/api/calendar?token=<enc>` | Trả `text/calendar`. Tuỳ chọn `&from=YYYY-MM-DD&to=YYYY-MM-DD`. |
 
-### 2. Lấy dữ liệu lịch học dưới dạng JSON
+### Kiến trúc
 
-Gửi request GET tới:
+Stateless, hợp serverless: `/api/link` mã hoá `{username,password}` (AES-256-GCM,
+khoá = SHA-256 của `ENCRYPTION_KEY`) vào URL. `/api/calendar` giải mã → **login
+tươi mỗi lần gọi** → lấy lịch → trả `.ics`. Token OneUni sống 30 phút nên luôn
+login lại, không cần lưu state.
 
-```
-http://localhost:3000/api?k=MA_K_CUA_BAN
-```
+### API OneUni (ASCVN)
 
-- Tuỳ chọn: Thêm `w` để lấy số tuần (mặc định là 8 tuần).
-  - Ví dụ: `http://localhost:3000/api?k=MA_K_CUA_BAN&w=10`
+- **Token:** `POST https://mobile.oneuni.com.vn/AUTH/connect/token` — OAuth2
+  password grant. Field `url_uni` route request về hệ thống của trường (bắt buộc).
+- **Dữ liệu:** `POST <url_uni>api/v1/SinhVien/LichHocLichThi` kèm `Bearer` token,
+  `loaiLich: 0` = cả học lẫn thi. Server tự biết SV qua token.
 
-Kết quả: Nhận về dữ liệu JSON chứa thông tin các lớp học.
+### Bảng tiết → giờ (IUH)
 
-## Ví dụ
+Response **không có giờ đồng hồ**, chỉ có `tietHocThi` dạng text → map bằng bảng
+cố định trong [`src/utils/transIntoTime.js`](src/utils/transIntoTime.js). Học và
+thi khác giờ:
 
+- **Học:** mỗi tiết 50 phút. `Tiết a - b` → start = giờ bắt đầu tiết `a`,
+  end = giờ bắt đầu tiết `b` + 50′. VD `Tiết 1 - 3` → **06:30–09:00**.
+- **Thi:** start theo bảng riêng (60′ / 90′) theo tiết đầu; end = start + số phút
+  thi (từ `chiTiets`). VD thi 60′ `Tiết 5 - 6` → **10:10–11:10**.
+
+### Cert TLS
+
+`sv.iuh.edu.vn` chỉ gửi leaf cert, **thiếu intermediate CA** → Node báo
+`UNABLE_TO_VERIFY_LEAF_SIGNATURE`. Không tắt verify: đã nạp intermediate
+`RapidSSL TLS RSA CA G1` ([`src/certs/rapidssl-intermediate.pem`](src/certs/rapidssl-intermediate.pem))
+làm CA cho undici Agent, kèm root mặc định của Node — verify **vẫn bật**
+(`rejectUnauthorized: true`), chỉ áp cho host dữ liệu. Chuỗi:
+leaf → `RapidSSL TLS RSA CA G1` → `DigiCert Global Root G2` (có sẵn trong Node).
+
+Nếu trường xoay cert sang CA khác, tải intermediate mới:
 ```bash
-curl "http://localhost:3000/api?k=abcxyz123&w=8"
+openssl s_client -connect sv.iuh.edu.vn:443 -servername sv.iuh.edu.vn </dev/null 2>/dev/null \
+  | openssl x509 -noout -ext authorityInfoAccess         # đọc CA Issuers URL
+curl -s <CA-Issuers-URL> | openssl x509 -inform DER -out src/certs/rapidssl-intermediate.pem
 ```
 
-## Thông tin thêm
-
-- Nếu không cung cấp tham số `k`, hệ thống sẽ báo lỗi.
-- Dữ liệu lấy trực tiếp từ hệ thống IUH, cần đảm bảo mã `k` hợp lệ.
+---
 
 ## Liên hệ
 
-Nếu có vấn đề hoặc góp ý, vui lòng liên hệ qua GitHub Issues.
+Vấn đề hoặc góp ý: mở GitHub Issue.

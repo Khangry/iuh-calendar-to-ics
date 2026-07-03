@@ -17,3 +17,21 @@ export const _TRANS_INTO_STUDY_TIME = {
   16: '20:40',
   17: '21:30',
 };
+export const _TRANS_INTO_60_MINUTES_EXAM_START_TIME = {
+  1: '06:30',
+  3: '08:20',
+  5: '10:10',
+  7: '12:30',
+  9: '14:20',
+  11: '16:10',
+  13: '18:00',
+  15: '19:50',
+};
+export const _TRANS_INTO_90_MINUTES_EXAM_START_TIME = {
+  1: '06:30',
+  4: '09:10',
+  6: '12:30',
+  9: '15:10',
+  13: '18:00',
+};
+

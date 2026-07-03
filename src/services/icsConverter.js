@@ -1,4 +1,6 @@
 // File: src/services/icsConverter.js (ESM)
+// Xuất danh sách sự kiện -> chuỗi .ics chuẩn RFC 5545.
+// Giờ địa phương gắn TZID Asia/Ho_Chi_Minh (+07), dòng CRLF, escape ký tự.
 
 function foldLine(line) {
   const maxLen = 75;
@@ -19,70 +21,82 @@ function foldLine(line) {
 
 function escapeIcsText(text) {
   if (!text) return '';
-  return text
+  return String(text)
     .replace(/\\/g, '\\\\')
-    .replace(/,/g, '\\,')
     .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
     .replace(/\n/g, '\\n');
 }
 
-function formatIcsDateTimeUTC(ngay, gio) {
-  if (!ngay || !gio) return null;
-  const [day, month, year] = ngay.split('/');
-  const [hours, minutes] = gio.split(':');
-  const localDate = new Date(year, month - 1, day, hours, minutes);
-  return localDate.toISOString().replace(/[-:.]/g, '').slice(0, 15);
+function pad(n) {
+  return String(n).padStart(2, '0');
 }
 
-export function convertToIcs(allClasses) {
-  let icsContent = [
+// 'YYYY-MM-DD' + 'HH:MM' -> 'YYYYMMDDTHHMMSS' (giờ địa phương, không hậu tố Z).
+function fmtLocal(date, hhmm) {
+  const [y, mo, d] = date.split('-');
+  const [h, mi] = hhmm.split(':');
+  return `${y}${mo}${d}T${pad(h)}${pad(mi)}00`;
+}
+
+function stampUTC() {
+  const now = new Date();
+  return (
+    `${now.getUTCFullYear()}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}` +
+    `T${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}${pad(now.getUTCSeconds())}Z`
+  );
+}
+
+/**
+ * @param {object[]} events - từ scheduleMapper.toEvents()
+ * @returns {string} nội dung .ics
+ */
+export function convertToIcs(events) {
+  const stamp = stampUTC();
+  const lines = [
     'BEGIN:VCALENDAR',
-    'PRODID:TuanKhangCalendar',
     'VERSION:2.0',
+    'PRODID:-//iuh-calendar-to-ics//OneUni//VI',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'X-WR-CALNAME:Lịch học & thi (IUH)',
     'X-WR-TIMEZONE:Asia/Ho_Chi_Minh',
+    'BEGIN:VTIMEZONE',
+    'TZID:Asia/Ho_Chi_Minh',
+    'BEGIN:STANDARD',
+    'DTSTART:19700101T000000',
+    'TZOFFSETFROM:+0700',
+    'TZOFFSETTO:+0700',
+    'TZNAME:+07',
+    'END:STANDARD',
+    'END:VTIMEZONE',
   ];
-  allClasses.forEach((classInfo) => {
-    if (!classInfo.ngay || !classInfo.gioBatDau || !classInfo.gioKetThuc)
-      return;
-    const dtstart = formatIcsDateTimeUTC(classInfo.ngay, classInfo.gioBatDau);
-    const dtend = formatIcsDateTimeUTC(classInfo.ngay, classInfo.gioKetThuc);
-    const dtstamp =
-      new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15);
-    const uid = `${dtstart}-${classInfo.code.replace(/\s/g, '')}@iuh.edu.vn`;
-    const summary = `[${classInfo.phongHoc}] - ${classInfo.name}`;
-    const descriptionParts = [
-      classInfo.name,
-      classInfo.code,
-      classInfo.tietHocRaw,
-      `Phòng: ${classInfo.phongHoc}`,
-      `GV: ${classInfo.giangVien}`,
-    ];
-    const description = descriptionParts
-      .map((part) => escapeIcsText(part))
-      .join('\\n');
 
-    icsContent.push('BEGIN:VEVENT');
-    icsContent.push(
-      foldLine(`UID:${uid}`),
-      `DTSTAMP:${dtstamp}`,
-      `DTSTART:${dtstart}`,
-      `DTEND:${dtend}`
-    );
-    icsContent.push(foldLine(`SUMMARY:${escapeIcsText(summary)}`));
-    icsContent.push(`DESCRIPTION:${description}`);
-    icsContent.push(`LAST-MODIFIED:${dtstamp}`);
-    icsContent.push(foldLine(`LOCATION:${escapeIcsText(classInfo.phongHoc)}`));
-    icsContent.push('TRANSP:OPAQUE');
-    icsContent.push('BEGIN:VALARM');
-    icsContent.push('ACTION:DISPLAY');
-    icsContent.push(`DESCRIPTION:${description}`);
-    icsContent.push('TRIGGER:-P0DT0H10M0S');
-    icsContent.push('END:VALARM');
-    icsContent.push('END:VEVENT');
+  events.forEach((e) => {
+    // UID ổn định derive từ id nội bộ -> calendar update thay vì tạo trùng.
+    const uid = `iuh-${e.id}@oneuni`;
+    lines.push('BEGIN:VEVENT');
+    lines.push(foldLine(`UID:${uid}`));
+    lines.push(`DTSTAMP:${stamp}`);
+    lines.push(`DTSTART;TZID=Asia/Ho_Chi_Minh:${fmtLocal(e.date, e.startHM)}`);
+    lines.push(`DTEND;TZID=Asia/Ho_Chi_Minh:${fmtLocal(e.date, e.endHM)}`);
+    lines.push(foldLine(`SUMMARY:${escapeIcsText(e.title)}`));
+    if (e.location) {
+      lines.push(foldLine(`LOCATION:${escapeIcsText(e.location)}`));
+    }
+    if (e.desc) {
+      lines.push(foldLine(`DESCRIPTION:${escapeIcsText(e.desc)}`));
+    }
+    lines.push(`LAST-MODIFIED:${stamp}`);
+    lines.push('TRANSP:OPAQUE');
+    lines.push('BEGIN:VALARM');
+    lines.push('ACTION:DISPLAY');
+    lines.push(foldLine(`DESCRIPTION:${escapeIcsText(e.title)}`));
+    lines.push('TRIGGER:-PT15M');
+    lines.push('END:VALARM');
+    lines.push('END:VEVENT');
   });
-  icsContent.push('END:VCALENDAR');
-  return icsContent.join('\r\n');
+
+  lines.push('END:VCALENDAR');
+  return lines.join('\r\n');
 }

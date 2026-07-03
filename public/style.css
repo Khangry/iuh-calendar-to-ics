@@ -32,6 +32,19 @@ button {
   margin-top: 12px;
   display: none;
 }
+#result a {
+  display: block;
+  word-break: break-all;
+  margin-top: 8px;
+  color: #1565c0;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
 #error {
   color: #b71c1c;
   background: #ffeaea;
