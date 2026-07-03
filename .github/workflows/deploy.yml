@@ -24,10 +24,31 @@ jobs:
           ENCRYPTION_KEY: ci-test-secret-key
           CLIENT_SECRET: ci-test-secret
 
-  deploy:
-    needs: test # deploy chỉ chạy khi job test xanh
+  # Bỏ qua deploy (không đỏ CI) nếu chưa cấu hình secret VERCEL_TOKEN.
+  guard:
+    needs: test
     runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.check.outputs.ready }}
+    steps:
+      - id: check
+        env:
+          TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -n "$TOKEN" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Chưa set secret VERCEL_TOKEN -> bỏ qua deploy."
+          fi
+
+  deploy:
+    needs: [test, guard]
+    if: needs.guard.outputs.ready == 'true'
+    runs-on: ubuntu-latest
+    # Vercel CLI tự đọc các biến này từ env (không cần cờ --token).
     env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
@@ -38,8 +59,8 @@ jobs:
       - name: Install Vercel CLI
         run: npm i -g vercel@latest
       - name: Pull cấu hình Vercel
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=production
       - name: Build
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --prod
       - name: Deploy production
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prebuilt --prod
