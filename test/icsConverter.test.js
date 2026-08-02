@@ -50,6 +50,13 @@ test('ICS: mỗi event 1 cặp VEVENT, có VALARM', () => {
   assert.match(ics, /BEGIN:VALARM/);
 });
 
+test('ICS: học nhắc trước 5 phút, thi nhắc trước 24 giờ và 5 phút', () => {
+  const ics = convertToIcs([study, exam]);
+  assert.match(ics, /SUMMARY:Mạch điện[\s\S]*?TRIGGER:-PT5M/);
+  assert.match(ics, /SUMMARY:\[Thi\] Mạch điện[\s\S]*?TRIGGER:-P1D/);
+  assert.match(ics, /SUMMARY:\[Thi\] Mạch điện[\s\S]*?TRIGGER:-P1D[\s\S]*?TRIGGER:-PT5M/);
+});
+
 test('ICS: list rỗng vẫn ra calendar hợp lệ', () => {
   const ics = convertToIcs([]);
   assert.match(ics, /BEGIN:VCALENDAR/);
