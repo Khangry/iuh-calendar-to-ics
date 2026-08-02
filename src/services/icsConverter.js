@@ -92,9 +92,9 @@ export function convertToIcs(events) {
     const alarmTriggers = e.isExam ? ['-P1D', '-PT5M'] : ['-PT5M'];
     alarmTriggers.forEach((trigger) => {
       lines.push('BEGIN:VALARM');
-      lines.push('ACTION:DISPLAY');
-      lines.push(foldLine(`DESCRIPTION:${escapeIcsText(e.title)}`));
       lines.push(`TRIGGER:${trigger}`);
+      lines.push('ACTION:DISPLAY');
+      lines.push('DESCRIPTION:Reminder');
       lines.push('END:VALARM');
     });
     lines.push('END:VEVENT');
