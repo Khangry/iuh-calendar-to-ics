@@ -61,9 +61,10 @@ test('học một tiết "Tiết 7" -> 12:30–13:20', () => {
   assert.equal(e.endHM, '13:20');
 });
 
-test('description gộp LHP | Nhóm | GV', () => {
+test('description gồm LHP | tiết | nhóm | GV', () => {
   const e = toEvent(studyItem());
   assert.match(e.desc, /LHP: 429700192705/);
+  assert.match(e.desc, /Tiết: 1 - 3/);
   assert.match(e.desc, /Nhóm 1/);
   assert.match(e.desc, /GV: Nguyễn Văn A/);
 });

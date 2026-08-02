@@ -58,6 +58,7 @@ export function toEvent(item) {
 
   const desc = [
     item.maLopHocPhan && `LHP: ${item.maLopHocPhan}`,
+    `Tiết: ${first} - ${last}`,
     nhom && `Nhóm ${nhom}`,
     hinhThuc && `Hình thức: ${hinhThuc}`,
     gv && `GV: ${gv}`,
