@@ -55,8 +55,10 @@ export function toEvent(item) {
   const gv = chiTiet(item, 'Giảng viên');
   const ghi = chiTiet(item, 'Ghi chú');
   const hinhThuc = chiTiet(item, 'Hình thức thi');
+  const lhp = item.maLopHocPhan;
 
   const desc = [
+    lhp && `LHP: ${lhp}`,
     `Tiết: ${first} - ${last}`,
     nhom && `Nhóm ${nhom}`,
     hinhThuc && `Hình thức: ${hinhThuc}`,
