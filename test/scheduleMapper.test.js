@@ -36,7 +36,7 @@ test('học "Tiết 1 - 3" -> 06:30–09:00', () => {
   assert.equal(e.startHM, '06:30');
   assert.equal(e.endHM, '09:00');
   assert.equal(e.isExam, false);
-  assert.equal(e.title, 'Mạch điện');
+  assert.equal(e.title, '[V13.01] Mạch điện');
 });
 
 test('thi 60 phút "Tiết 5 - 6" -> 10:10–11:10, có prefix [Thi]', () => {
@@ -44,7 +44,7 @@ test('thi 60 phút "Tiết 5 - 6" -> 10:10–11:10, có prefix [Thi]', () => {
   assert.equal(e.startHM, '10:10');
   assert.equal(e.endHM, '11:10');
   assert.equal(e.isExam, true);
-  assert.equal(e.title, '[Thi] Mạch điện');
+  assert.equal(e.title, '[Thi] [V13.01] Mạch điện');
 });
 
 test('thi 90 phút "Tiết 1 - 3" -> 06:30–08:00', () => {

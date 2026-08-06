@@ -68,7 +68,7 @@ export function toEvent(item) {
 
   return {
     id: item.id,
-    title: `${isExam ? '[Thi] ' : ''}${item.tenMonHoc || ''}`.trim(),
+    title: `${isExam ? '[Thi] ' : ''}${item.tenPhong ? `[${item.tenPhong}] ` : ''}${item.tenMonHoc || ''}`.trim(),
     location: item.tenPhong || '',
     date,
     startHM,
