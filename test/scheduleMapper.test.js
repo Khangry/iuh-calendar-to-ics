@@ -84,3 +84,9 @@ test('toEvents lọc bỏ item không hợp lệ', () => {
 test('date cắt còn YYYY-MM-DD', () => {
   assert.equal(toEvent(studyItem()).date, '2026-06-03');
 });
+
+test('chuẩn hóa tên phòng chỉ giữ mã phòng', () => {
+  const e = toEvent(studyItem({ tenPhong: 'Phòng B2.07 (B (CS1))' }));
+  assert.equal(e.location, 'B2.07');
+  assert.equal(e.title, '[B2.07] Mạch điện');
+});

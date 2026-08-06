@@ -24,6 +24,17 @@ function chiTiet(item, label) {
   return (item.chiTiets || []).find((c) => c.label === label)?.value ?? null;
 }
 
+function normalizeRoom(rawRoom) {
+  const room = String(rawRoom || '').trim();
+  if (!room) return '';
+
+  const noPrefix = room.replace(/^phòng\s+/i, '').trim();
+  const codeMatch = noPrefix.match(/[A-Z]{1,4}\d+(?:\.\d+)+/i);
+  if (codeMatch) return codeMatch[0].toUpperCase();
+
+  return noPrefix.replace(/\s*\(.*$/, '').trim();
+}
+
 /**
  * @param {object} item - phần tử trong result[] của API
  * @returns {object|null} sự kiện { id, title, location, date, startHM, endHM, desc, isExam }
@@ -55,6 +66,7 @@ export function toEvent(item) {
   const gv = chiTiet(item, 'Giảng viên');
   const ghi = chiTiet(item, 'Ghi chú');
   const hinhThuc = chiTiet(item, 'Hình thức thi');
+  const location = normalizeRoom(item.tenPhong);
 
   const desc = [
     `Tiết: ${first} - ${last}`,
@@ -68,8 +80,8 @@ export function toEvent(item) {
 
   return {
     id: item.id,
-    title: `${isExam ? '[Thi] ' : ''}${item.tenPhong ? `[${item.tenPhong}] ` : ''}${item.tenMonHoc || ''}`.trim(),
-    location: item.tenPhong || '',
+    title: `${isExam ? '[Thi] ' : ''}${location ? `[${location}] ` : ''}${item.tenMonHoc || ''}`.trim(),
+    location,
     date,
     startHM,
     endHM,
