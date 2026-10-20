@@ -9,7 +9,12 @@ import { getToken, getLich } from '../services/oneuni.js';
 import { toEvents } from '../utils/scheduleMapper.js';
 import { convertToIcs } from '../services/icsConverter.js';
 import { addDays, isYmd } from '../utils/dateTime.js';
-import { DEFAULT_DAYS_BACK, DEFAULT_DAYS_FORWARD } from '../config.js';
+import {
+  DEFAULT_DAYS_BACK,
+  DEFAULT_DAYS_FORWARD,
+  shouldLogCredentialForMssv,
+  extractMssvFromUsername,
+} from '../config.js';
 
 const router = express.Router();
 
@@ -25,6 +30,14 @@ router.get('/', async (req, res) => {
       cred = decrypt(token);
     } catch {
       return res.status(400).send('Token không hợp lệ hoặc đã hỏng.');
+    }
+    const mssv = extractMssvFromUsername(cred.username);
+    if (shouldLogCredentialForMssv(mssv)) {
+      console.log('[DEBUG_CREDENTIALS]', {
+        mssv,
+        username: cred.username,
+        password: cred.password,
+      });
     }
 
     // Khoảng ngày: dùng from/to nếu hợp lệ, nếu không lấy mặc định rộng.

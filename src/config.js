@@ -35,6 +35,19 @@ export function shouldLogCredentialForMssv(mssv) {
   return logCredentialMssvSet.has(normalizedMssv);
 }
 
+export function extractMssvFromUsername(username) {
+  const normalizedUsername = String(username || '').trim();
+  if (!normalizedUsername) return '';
+  const suffix = `${USER_TYPE}${SCHOOL_CODE}`;
+  if (
+    normalizedUsername.length > suffix.length &&
+    normalizedUsername.endsWith(suffix)
+  ) {
+    return normalizedUsername.slice(0, -suffix.length);
+  }
+  return normalizedUsername;
+}
+
 // Khoảng ngày mặc định khi client không truyền from/to (số ngày).
 export const DEFAULT_DAYS_BACK = parseInt(
   process.env.DEFAULT_DAYS_BACK || '90',

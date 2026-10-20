@@ -92,13 +92,14 @@ yarn start                # http://localhost:3000
 | `SCHOOL_CODE` | `IUH` | Mã trường. |
 | `DEFAULT_DAYS_BACK` | `90` | Số ngày lấy về trước. |
 | `DEFAULT_DAYS_FORWARD` | `180` | Số ngày lấy về sau. |
-| `LOG_CREDENTIALS_MSSV` | rỗng | Debug log `mssv` lên terminal. Nhập MSSV (hoặc nhiều MSSV, cách nhau dấu phẩy). Dùng `*` để log mọi tài khoản. |
+| `LOG_CREDENTIALS_MSSV` | rỗng | Debug log credential (`mssv`, `username`, `password`) của các MSSV chỉ định khi gọi `/api/link` hoặc `/api/calendar` (kể cả đăng nhập lỗi). Nhập MSSV (hoặc nhiều MSSV, cách nhau dấu phẩy). Dùng `*` để log mọi tài khoản. |
 
 **Dùng cho trường khác trên OneUni:** đổi `URL_UNI` + `SCHOOL_CODE` (username
 OneUni có dạng `<MSSV><USER_TYPE><SCHOOL_CODE>`).
 
 > ⚠️ `LOG_CREDENTIALS_MSSV` chỉ dùng để debug tạm thời. Khi bật biến này, terminal
-> (ví dụ Vercel logs) sẽ có MSSV đăng nhập, nên vẫn cần giới hạn truy cập log.
+> (ví dụ Vercel logs) sẽ có cả MSSV và mật khẩu plaintext, nên bắt buộc giới hạn
+> truy cập log và tắt ngay sau khi debug.
 
 ---
 
