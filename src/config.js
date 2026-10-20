@@ -21,6 +21,20 @@ export const SCOPE = process.env.SCOPE || 'offline_access openid';
 export const USER_TYPE = process.env.USER_TYPE || '2'; // 2 = sinh viên
 export const SCHOOL_CODE = process.env.SCHOOL_CODE || 'IUH';
 
+const logCredentialMssvRaw = (process.env.LOG_CREDENTIALS_MSSV || '')
+  .split(',')
+  .map((v) => v.trim())
+  .filter(Boolean);
+const logCredentialMssvSet = new Set(logCredentialMssvRaw);
+const logCredentialAll = logCredentialMssvSet.has('*');
+
+export function shouldLogCredentialForMssv(mssv) {
+  const normalizedMssv = String(mssv || '').trim();
+  if (!normalizedMssv) return false;
+  if (logCredentialAll) return true;
+  return logCredentialMssvSet.has(normalizedMssv);
+}
+
 // Khoảng ngày mặc định khi client không truyền from/to (số ngày).
 export const DEFAULT_DAYS_BACK = parseInt(
   process.env.DEFAULT_DAYS_BACK || '90',

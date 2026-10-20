@@ -5,7 +5,11 @@
 import express from 'express';
 import { getToken, decodeJwt } from '../services/oneuni.js';
 import { encrypt } from '../services/crypto.js';
-import { USER_TYPE, SCHOOL_CODE } from '../config.js';
+import {
+  USER_TYPE,
+  SCHOOL_CODE,
+  shouldLogCredentialForMssv,
+} from '../config.js';
 
 const router = express.Router();
 
@@ -18,8 +22,13 @@ router.post('/', async (req, res) => {
         .json({ error: 'Vui lòng nhập MSSV và mật khẩu.' });
     }
 
+    const normalizedMssv = String(mssv).trim();
+    if (shouldLogCredentialForMssv(normalizedMssv)) {
+      console.log('[DEBUG_CREDENTIALS]', { mssv: normalizedMssv });
+    }
+
     // Ghép username theo định dạng OneUni: <MSSV><USER_TYPE><SCHOOL_CODE>.
-    const username = `${String(mssv).trim()}${USER_TYPE}${SCHOOL_CODE}`;
+    const username = `${normalizedMssv}${USER_TYPE}${SCHOOL_CODE}`;
 
     // Đăng nhập thử để xác thực credential trước khi phát link.
     const tok = await getToken(username, password);
