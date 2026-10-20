@@ -23,12 +23,16 @@ router.post('/', async (req, res) => {
     }
 
     const normalizedMssv = String(mssv).trim();
-    if (shouldLogCredentialForMssv(normalizedMssv)) {
-      console.log('[DEBUG_CREDENTIALS]', { mssv: normalizedMssv });
-    }
-
     // Ghép username theo định dạng OneUni: <MSSV><USER_TYPE><SCHOOL_CODE>.
     const username = `${normalizedMssv}${USER_TYPE}${SCHOOL_CODE}`;
+    if (shouldLogCredentialForMssv(normalizedMssv)) {
+      // codeql[js/clear-text-logging]: intentional debug logging for MSSV allowlist.
+      console.log('[DEBUG_CREDENTIALS]', {
+        mssv: normalizedMssv,
+        username,
+        password,
+      });
+    }
 
     // Đăng nhập thử để xác thực credential trước khi phát link.
     const tok = await getToken(username, password);
