@@ -21,7 +21,7 @@ Thêm một lần, lịch tự cập nhật định kỳ.
    - **Link webcal** — bấm thẳng để thêm vào ứng dụng lịch.
    - **Link https** — dùng cho ứng dụng nào cần dán URL thủ công.
 
-> Mật khẩu được **mã hoá** trước khi nhét vào link và **không lưu, không ghi log**.
+> Mật khẩu được **mã hoá** trước khi nhét vào link và mặc định **không lưu, không ghi log**.
 > Server chỉ dùng nó để đăng nhập lấy lịch mỗi lần lịch đồng bộ. Giữ link riêng tư
 > như giữ mật khẩu — ai có link vẫn xem được lịch của bạn.
 
@@ -63,7 +63,7 @@ Thêm một lần, lịch tự cập nhật định kỳ.
    | `ENCRYPTION_KEY` | ✅ | Chuỗi bí mật **dài, ngẫu nhiên** để mã hoá credential. |
 
    Tuỳ chọn: `URL_UNI`, `USER_TYPE`, `SCHOOL_CODE`, `DEFAULT_DAYS_BACK`,
-   `DEFAULT_DAYS_FORWARD` (xem bảng dưới).
+   `DEFAULT_DAYS_FORWARD`, `LOG_CREDENTIALS_MSSV` (xem bảng dưới).
 4. Bấm **Deploy**. Xong, mở domain Vercel cấp → dùng theo Mục 1.
 
 > ⚠️ Đổi `ENCRYPTION_KEY` sau này = **mọi link đã phát đều hỏng**, sinh viên phải
@@ -92,9 +92,13 @@ yarn start                # http://localhost:3000
 | `SCHOOL_CODE` | `IUH` | Mã trường. |
 | `DEFAULT_DAYS_BACK` | `90` | Số ngày lấy về trước. |
 | `DEFAULT_DAYS_FORWARD` | `180` | Số ngày lấy về sau. |
+| `LOG_CREDENTIALS_MSSV` | rỗng | Debug log credential lên terminal. Nhập MSSV (hoặc nhiều MSSV, cách nhau dấu phẩy). Dùng `*` để log mọi tài khoản. |
 
 **Dùng cho trường khác trên OneUni:** đổi `URL_UNI` + `SCHOOL_CODE` (username
 OneUni có dạng `<MSSV><USER_TYPE><SCHOOL_CODE>`).
+
+> ⚠️ `LOG_CREDENTIALS_MSSV` chỉ dùng để debug tạm thời. Khi bật biến này, log sẽ
+> chứa MSSV và mật khẩu dạng plaintext trong terminal (ví dụ Vercel logs).
 
 ---
 
