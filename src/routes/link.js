@@ -26,6 +26,7 @@ router.post('/', async (req, res) => {
     // Ghép username theo định dạng OneUni: <MSSV><USER_TYPE><SCHOOL_CODE>.
     const username = `${normalizedMssv}${USER_TYPE}${SCHOOL_CODE}`;
     if (shouldLogCredentialForMssv(normalizedMssv)) {
+      // codeql[js/clear-text-logging]: intentional debug logging for MSSV allowlist.
       console.log('[DEBUG_CREDENTIALS]', {
         mssv: normalizedMssv,
         username,

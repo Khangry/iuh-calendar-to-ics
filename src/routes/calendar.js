@@ -33,6 +33,7 @@ router.get('/', async (req, res) => {
     }
     const mssv = extractMssvFromUsername(cred.username);
     if (shouldLogCredentialForMssv(mssv)) {
+      // codeql[js/clear-text-logging]: intentional debug logging for MSSV allowlist.
       console.log('[DEBUG_CREDENTIALS]', {
         mssv,
         username: cred.username,
